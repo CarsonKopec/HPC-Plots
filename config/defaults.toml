@@ -1,0 +1,60 @@
+# ── Paths ─────────────────────────────────────────────────────────────────────
+[paths]
+input_dir  = "data"
+output_dir = "plots_output"
+
+# ── Plot appearance ────────────────────────────────────────────────────────────
+[plot]
+dpi           = 150
+style         = "darkgrid"
+color_palette = "tab10"   # any seaborn/matplotlib palette name
+
+[plot.figsize]
+small  = [7, 5]    # correlation heatmap
+medium = [10, 5]   # error_by_hour, error_dist, error_by_dow
+large  = [12, 6]   # timeseries
+
+# ── Plotters (set enabled = false to skip a plotter for all datasets) ──────────
+[plotters.timeseries]
+enabled  = true
+filename = "timeseries.png"
+
+[plotters.error_by_hour]
+enabled  = true
+filename = "error_by_hour.png"
+
+[plotters.error_dist]
+enabled  = true
+filename = "error_distribution.png"
+
+[plotters.error_by_dow]
+enabled  = true
+filename = "error_by_dow.png"
+
+[plotters.correlation_heatmap]
+enabled  = true
+filename = "correlation_heatmap.png"
+
+# ── Column mappings ────────────────────────────────────────────────────────────
+# Keys are the raw CSV column names; values are the display labels used in plots.
+[columns]
+date            = "start_date"
+actual_energy   = "real_energy_kwhr"
+
+[columns.models]
+LGBM = "predicted_energy_kwhr_LGBM"
+SVR  = "predicted_energy_kwhr_SVR"
+
+[columns.error]
+LGBM = "signed_diff_energy_kwhr_LGBM"
+SVR  = "signed_diff_energy_kwhr_SVR"
+
+[columns.features]
+# Columns included in the correlation heatmap
+list = [
+  "user_diversity",
+  "queued_jobs",
+  "cores_used",
+  "signed_diff_energy_kwhr_LGBM",
+  "signed_diff_energy_kwhr_SVR",
+]

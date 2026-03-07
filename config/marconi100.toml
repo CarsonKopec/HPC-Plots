@@ -1,0 +1,13 @@
+# Per-dataset overrides for Marconi100.
+# Only specify what differs from config/defaults.toml - everything else is inherited.
+
+[plot]
+dpi = 200   # higher res for this dataset
+
+[plotters.error_dist]
+enabled = false   # skip this plot for marconi100
+
+# If this dataset uses different column names, override them here:
+# [columns.error]
+# LGBM = "diff_energy_LGBM"
+# SVR  = "diff_energy_SVR"
