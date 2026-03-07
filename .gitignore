@@ -1,2 +1,4 @@
-plots_output/
+plots/
 data/
+__pycache__/
+*.pyc

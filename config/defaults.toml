@@ -1,7 +1,7 @@
 # ── Paths ─────────────────────────────────────────────────────────────────────
 [paths]
 input_dir  = "data"
-output_dir = "plots_output"
+output_dir = "plots"
 
 # ── Plot appearance ────────────────────────────────────────────────────────────
 [plot]

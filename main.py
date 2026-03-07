@@ -6,13 +6,15 @@ import pandas as pd
 import seaborn as sns
 
 from config_loader import load_config
-from plots.error_by_dow import ErrorByDOW
-from plots.error_by_hour import ErrorByHour
-from plots.error_dist import ErrorDist
-from plots.timeseries import TimeSeriesPlotter
-from plots.correlation_heatmap import CorrelationHeatmap
+from source.metrics import compute_metrics
+from source.metrics_summary import build_summary
+from source.error_by_dow import ErrorByDOW
+from source.error_by_hour import ErrorByHour
+from source.error_dist import ErrorDist
+from source.timeseries import TimeSeriesPlotter
+from source.correlation_heatmap import CorrelationHeatmap
 
-# Matches: consolidated_<n>_predictions.csv  ->  captures <n>
+# Matches: consolidated_<n>_predictions.csv  →  captures <n>
 FILENAME_RE = re.compile(r"^consolidated_([a-zA-Z0-9_]+)_predictions\.csv$", re.IGNORECASE)
 
 
@@ -44,10 +46,13 @@ def discover_csvs(input_dir: str) -> list[str]:
     return paths
 
 
-def run_pipeline(csv_path: str) -> None:
-    """Run the full plotting pipeline for a single CSV file."""
-    filename             = os.path.basename(csv_path)
-    dataset_name, slug   = parse_dataset_name(filename)
+def run_pipeline(csv_path: str) -> list[dict]:
+    """
+    Run the full plotting pipeline for a single CSV file.
+    Returns the raw metrics rows for this dataset to be consolidated by the caller.
+    """
+    filename           = os.path.basename(csv_path)
+    dataset_name, slug = parse_dataset_name(filename)
 
     # Load defaults, deep-merged with any per-dataset overrides
     cfg = load_config(slug)
@@ -63,8 +68,6 @@ def run_pipeline(csv_path: str) -> None:
     df[cfg["columns"]["date"]] = pd.to_datetime(df[cfg["columns"]["date"]])
     sns.set_style(cfg["plot"]["style"])
 
-    # Each entry: (plotter_key, constructor)
-    # Skipped automatically if plotters.<key>.enabled = false in config
     plotters = [
         ("timeseries",          lambda: TimeSeriesPlotter(df, dataset_name, output_path, cfg).plot()),
         ("error_by_hour",       lambda: ErrorByHour(df, dataset_name, output_path, cfg).plot()),
@@ -80,13 +83,23 @@ def run_pipeline(csv_path: str) -> None:
         print(f"│  Plotting {key}...")
         plotter_fn()
 
+    rows = compute_metrics(df, dataset_name, cfg)
     print(f"└─ Done.\n")
+    return rows
 
 
 if __name__ == "__main__":
-    # Input dir comes from defaults.toml [paths] but can be overridden here
-    defaults = load_config()
+    defaults  = load_config()
     csv_files = discover_csvs(defaults["paths"]["input_dir"])
     print(f"Found {len(csv_files)} dataset(s) in '{defaults['paths']['input_dir']}'\n")
+
+    # Accumulate metric rows across all datasets
+    all_metrics: list[dict] = []
     for path in csv_files:
-        run_pipeline(path)
+        all_metrics.extend(run_pipeline(path))
+
+    # Consolidate and write metrics.csv + metrics_summary.png in one step
+    print("┌─ Building metrics summary across all datasets...")
+    metrics_df = pd.DataFrame(all_metrics)
+    build_summary(metrics_df, defaults["paths"]["output_dir"], dpi=defaults["plot"]["dpi"])
+    print("└─ Done.\n")
