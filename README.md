@@ -64,8 +64,8 @@ All Python dependencies are declared in `environment.yml`.
 ### 1. Clone the repository
 
 ```bash
-git clone <your-repo-url>
-cd <repo-folder>
+git clone https://github.com/CarsonKopec/HPC-Plots
+cd HPC-Plots
 ```
 
 ### 2. Create the Conda environment
