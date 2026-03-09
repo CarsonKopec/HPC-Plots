@@ -34,12 +34,59 @@ filename = "error_by_dow.png"
 [plotters.correlation_heatmap]
 enabled  = true
 filename = "correlation_heatmap.png"
+cmap     = "coolwarm"   # any diverging colormap e.g. "vlag", "icefire", "RdBu_r"
+
+# Cell size in inches — figure scales automatically to keep cells compact.
+# Increase if annotations are cramped; decrease to shrink the overall plot.
+cell_width  = 0.7
+cell_height = 0.5
+
+# ── Axis assignment ────────────────────────────────────────────────────────────
+# Specify which feature IDs (from [columns.features]) appear on each axis.
+# Omit either list to default to all IDs.
+row_ids = [8, 9]
+col_ids = [1, 2, 3, 4, 5, 6, 7]
+
+# Lock flags control what happens to features not listed in row_ids / col_ids.
+#
+#   lock_rows = true  → row axis uses exactly row_ids; nothing is added
+#   lock_rows = false → unassigned features overflow onto the row axis
+#   (same logic applies to lock_cols)
+#
+# Overflow examples:
+#   lock_rows=true,  lock_cols=false → rows fixed; leftover IDs appended to cols
+#   lock_rows=false, lock_cols=true  → cols fixed; leftover IDs appended to rows
+#   lock_rows=false, lock_cols=false → both axes use all feature IDs (full square)
+#   lock_rows=true,  lock_cols=true  → both axes use exactly their specified IDs
+lock_rows = true
+lock_cols = true
+
+# ── Tiling ─────────────────────────────────────────────────────────────────────
+# Max features per axis tile before wrapping to a new tile.
+# 0 = no tiling (single heatmap).
+#
+# Example: 9 row IDs, 9 col IDs, max_rows=5, max_cols=5 →
+#   tile(0,0): rows[1-5] × cols[1-5]     tile(0,1): rows[1-5] × cols[6-9]
+#   tile(1,0): rows[6-9] × cols[1-5]     tile(1,1): rows[6-9] × cols[6-9]
+max_rows = 0
+max_cols = 0
+
+# ── Colorbar (legend) placement ────────────────────────────────────────────────
+# orientation : "vertical"   → colorbar sits on the side  (left / right)
+#               "horizontal" → colorbar sits above / below (top / bottom)
+# location    : "right" | "left" | "top" | "bottom"
+# shrink      : fraction of axes length the colorbar occupies (0.0 – 1.0)
+# pad         : gap between heatmap and colorbar (fraction of axes width)
+[plotters.correlation_heatmap.colorbar]
+orientation = "horizontal"
+location    = "top"
+shrink      = 0.8
+pad         = 0.02
 
 # ── Column mappings ────────────────────────────────────────────────────────────
-# Keys are the raw CSV column names; values are the display labels used in plots.
 [columns]
-date            = "start_date"
-actual_energy   = "real_energy_kwhr"
+date          = "start_date"
+actual_energy = "real_energy_kwhr"
 
 [columns.models]
 LGBM = "predicted_energy_kwhr_LGBM"
@@ -50,11 +97,15 @@ LGBM = "signed_diff_energy_kwhr_LGBM"
 SVR  = "signed_diff_energy_kwhr_SVR"
 
 [columns.features]
-# Columns included in the correlation heatmap
-list = [
-  "user_diversity",
-  "queued_jobs",
-  "cores_used",
-  "signed_diff_energy_kwhr_LGBM",
-  "signed_diff_energy_kwhr_SVR",
-]
+# Features available to the correlation heatmap.
+# Keys are integer IDs referenced by row_ids and col_ids above.
+# Values are the exact CSV column names.
+1 = "user_diversity"
+2 = "queued_jobs"
+3 = "queued_node_hours"
+4 = "total_mem_alloc"
+5 = "node_utilization"
+6 = "core_utilization"
+7 = "cores_used"
+8 = "signed_diff_energy_kwhr_LGBM"
+9 = "signed_diff_energy_kwhr_SVR"

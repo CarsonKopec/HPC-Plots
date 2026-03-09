@@ -20,7 +20,7 @@ class TimeSeriesPlotter:
         models     = cols["models"]   # {"LGBM": "predicted_energy_kwhr_LGBM", ...}
 
         fig, ax = plt.subplots(figsize=plot["figsize"]["large"])
-        sns.lineplot(data=self.df, x=date_col, y=actual_col, label="Actual Energy (kWh)", ax=ax)
+        sns.lineplot(data=self.df, x=date_col, y=actual_col, label="Actual Energy (kWh = Kilowatt-hour)", ax=ax)
 
         for label, col in models.items():
             sns.lineplot(data=self.df, x=date_col, y=col,
